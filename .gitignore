@@ -1,0 +1,16 @@
+# Shinylive build output
+site/
+
+# R / RStudio session cruft
+.Rproj.user/
+.Rhistory
+.Ruserdata
+/.RData
+
+# macOS
+.DS_Store
+
+# shinyapps.io deployment bundles - not used by shinylive
+manifest.json
+packrat/
+rsconnect/
