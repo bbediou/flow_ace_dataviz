@@ -33,8 +33,21 @@ jobs:
         shell: Rscript {0}
         run: install.packages("shinylive")
 
-      # Only shinylive is needed here. The app's own packages are downloaded
-      # by the visitor's browser from repo.r-wasm.org at runtime.
+      # shinylive::export() works out the app's dependency tree by inspecting
+      # packages installed on THIS runner, so they must be installed here even
+      # though the visitor's browser fetches WebAssembly builds at runtime.
+      # Without this, find.package() fails and the export aborts.
+      - name: Install the app's R packages
+        shell: Rscript {0}
+        run: |
+          install.packages("renv")
+          pkgs <- setdiff(unique(renv::dependencies("app")$Package),
+                          rownames(installed.packages()))
+          message("Installing: ", paste(pkgs, collapse = ", "))
+          if (length(pkgs)) install.packages(pkgs)
+
+      # Packages resolve from the runner installs above; the visitor's browser
+      # downloads the matching WebAssembly builds from repo.r-wasm.org.
       - name: Export app to static site
         shell: Rscript {0}
         run: shinylive::export("app", "site")
